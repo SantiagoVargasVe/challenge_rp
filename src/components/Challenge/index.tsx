@@ -4,33 +4,32 @@ import { STATUS_MAPPER } from './constants'
 import Phrase from '../Phrase'
 
 const Challenge = () => {
-    const [requestState, setRequestState] = useState<RequestState>('idle')
-    const [_, setPhrase] = useState<string>('')
+  const [requestState, setRequestState] = useState<RequestState>('idle')
+  const [phrase, setPhrase] = useState<string>('')
 
+  useEffect(() => {
+    setRequestState('loading')
 
-    useEffect(() => {
-        setRequestState('loading')
+    fetch(
+      'https://wgg522pwivhvi5gqsn675gth3q0otdja.lambda-url.us-east-1.on.aws/6f7263'
+    )
+      .then(async (response) => {
+        const phrase = await response.text()
 
-        fetch(
-            'https://wgg522pwivhvi5gqsn675gth3q0otdja.lambda-url.us-east-1.on.aws/6f7263'
-        ).then(async (response) => {
-            const phrase = await response.text()
+        setRequestState('success')
+        setPhrase(phrase)
+      })
+      .then(() => {})
+      .catch(() => {
+        setRequestState('error')
+      })
+  }, [])
 
-            setRequestState('success')
-            setPhrase(phrase)
+  if (requestState === 'success') {
+    return <Phrase phrase={phrase} />
+  }
 
-
-        }).then(() => { }).catch(() => {
-            setRequestState('error')
-        })
-    }, [])
-
-    if (requestState === 'success') {
-        return <Phrase phrase='hello' />
-    }
-
-
-    return <div>  {STATUS_MAPPER[requestState]} </div>
+  return <div> {STATUS_MAPPER[requestState]} </div>
 }
 
 export default Challenge
